@@ -1,106 +1,60 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, TextInput, Button, Alert } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, Alert, TouchableOpacity } from 'react-native';
 
-export default function Day2Task() {
-  // 1. JavaScript variable for Dynamic Rendering (Topic 3.4)
-  const internName = "Dell Intern"; 
-  const [topicInput, setTopicInput] = useState('');
-
-  const checkTaskStatus = () => {
-    if (topicInput.trim() === '') {
-      Alert.alert("Error!", "Please enter the topic name first.");
-    } else {
-      Alert.alert("Success!", `Congratulations! ${internName} has completed the task for ${topicInput}.`);
-    }
-  };
-
+function UserCard(props) {
   return (
-    // 2. VIEW: The main parent container component (Topic 3.5)
-    <View style={styles.container}>
-      
-      {/* 3. IMAGE: Displaying an online network logo */}
-      <Image 
-        source={{ uri: 'https://reactnative.dev' }} 
-        style={styles.logo} 
-      />
-
-      {/* 4. TEXT: Combination of Static and Dynamic Rendering (Topic 3.4) */}
-      <Text style={styles.heading}>Day 2: Intern Dashboard</Text>
-      <Text style={styles.welcomeText}>Welcome, {internName}! 👋</Text>
-      <Text style={styles.description}>
-        Today we are learning View, Text, Image, TextInput, and Button components.
-      </Text>
-
-      {/* 5. TEXTINPUT: Input field for user interaction */}
-      <TextInput
-        style={styles.inputBox}
-        placeholder="Which topic did you learn today?..."
-        placeholderTextColor="#888"
-        value={topicInput}
-        onChangeText={(text) => setTopicInput(text)}
-      />
-
-      {/* 6. BUTTON: Triggers the action on press */}
-      <View style={styles.buttonWrapper}>
-        <Button 
-          title="Verify My Day 2 Task" 
-          color="#4CAF50" 
-          onPress={checkTaskStatus} 
-        />
-      </View>
-
+    <View style={styles.cardContainer}>
+      <Text style={styles.cardTitle}>{props.name}</Text>
+      <Text style={styles.cardText}>📧 {props.email}</Text>
+      <Text style={styles.cardBadge}>{props.role}</Text>
     </View>
   );
 }
 
-// Styling section using StyleSheet
+export default function App() {
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [counterValue, setCounterValue] = useState(0);
+
+  return (
+    <View style={styles.mainContainer}>
+      <Text style={styles.sectionHeading}>Task 3.6: Reusable Component via Props</Text>
+      <UserCard name="Dell Intern" email="intern@dell.com" role="Mobile App Developer" />
+      <UserCard name="Alex Smith" email="alex@company.com" role="UI/UX Designer" />
+
+      <Text style={styles.sectionHeading}>Task 3.7: Interactive Features via State</Text>
+      <View style={styles.interactiveBox}>
+        <TextInput
+          style={styles.inputField}
+          placeholder="Enter your security password..."
+          placeholderTextColor="#888"
+          secureTextEntry={!isPasswordVisible}
+        />
+        <TouchableOpacity style={styles.toggleButton} onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
+          <Text style={styles.toggleButtonText}>
+            {isPasswordVisible ? "🙈 Hide Password" : "👁️ Show Password"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.counterBox}>
+        <Text style={styles.counterText}>Total Actions Logged: {counterValue}</Text>
+        <Button title="Increment Counter" color="#007AFF" onPress={() => setCounterValue(counterValue + 1)} />
+      </View>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 25,
-  },
-  logo: {
-    width: 90,
-    height: 90,
-    marginBottom: 15,
-  },
-  heading: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#333333',
-    marginBottom: 5,
-  },
-  welcomeText: {
-    fontSize: 18,
-    color: '#007AFF',
-    fontWeight: '600',
-    marginBottom: 15,
-  },
-  description: {
-    fontSize: 14,
-    color: '#666666',
-    textAlign: 'center',
-    marginBottom: 25,
-    lineHeight: 20,
-  },
-  inputBox: {
-    width: '100%',
-    height: 50,
-    borderColor: '#cccccc',
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    color: '#333333',
-    marginBottom: 20,
-    backgroundColor: '#fafafa',
-  },
-  buttonWrapper: {
-    width: '100%',
-    borderRadius: 10,
-    overflow: 'hidden',
-  },
+  mainContainer: { flex: 1, backgroundColor: '#f8f9fa', padding: 20, justifyContext: 'center' },
+  sectionHeading: { fontSize: 18, fontWeight: 'bold', color: '#333333', marginTop: 25, marginBottom: 12, borderBottomWidth: 1, borderBottomColor: '#e0e0e0', paddingBottom: 5 },
+  cardContainer: { backgroundColor: '#ffffff', padding: 15, borderRadius: 10, marginBottom: 10, borderWidth: 1, borderColor: '#e2e8f0', elevation: 2 },
+  cardTitle: { fontSize: 18, fontWeight: 'bold', color: '#1a202c' },
+  cardText: { fontSize: 14, color: '#4a5568', marginVertical: 4 },
+  cardBadge: { fontSize: 12, fontWeight: '600', color: '#007AFF', backgroundColor: '#ebf8ff', alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, marginTop: 4 },
+  interactiveBox: { backgroundColor: '#ffffff', padding: 15, borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0', marginBottom: 15 },
+  inputField: { height: 45, borderColor: '#cbd5e0', borderWidth: 1, borderRadius: 6, paddingHorizontal: 12, fontSize: 15, color: '#333333', backgroundColor: '#fafafa' },
+  toggleButton: { marginTop: 10, backgroundColor: '#4a5568', paddingVertical: 10, borderRadius: 6, alignItems: 'center' },
+  toggleButtonText: { color: '#ffffff', fontSize: 14, fontWeight: '600' },
+  counterBox: { backgroundColor: '#ffffff', padding: 15, borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0', alignItems: 'center' },
+  counterText: { fontSize: 16, fontWeight: '500', color: '#333333', marginBottom: 10 },
 });
