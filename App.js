@@ -1,196 +1,297 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Image, Alert } from 'react-native';
 
-export default function Day4App() {
-  const [searchText, setSearchText] = useState('');
-
+// =========================================================
+// 1. REUSABLE SERVICE CARD COMPONENT (Topic 3.6 - Props)
+// =========================================================
+function ServiceCard(props) {
   return (
-    <View style={styles.mainScreen}>
-      {/* 1. HEADER COMPONENT with Background and Padding */}
-      <View style={styles.headerContainer}>
-        <Text style={styles.headerTitle}>Day 4: Dashboard UI</Text>
-        <Text style={styles.headerSubtitle}>Styling & Flexbox Layout</Text>
-      </View>
-
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        
-        {/* 2. INPUT BOX: Styling with Border, Padding, and Radius */}
-        <TextInput
-          style={styles.searchBar}
-          placeholder="Search items or categories..."
-          placeholderTextColor="#888"
-          value={searchText}
-          onChangeText={(text) => setSearchText(text)}
-        />
-
-        {/* 3. VERTICAL LAYOUT SECTION: Elements stacked vertically */}
-        <Text style={styles.sectionTitle}>Featured Announcement</Text>
-        <View style={styles.largePromoCard}>
-          <Image 
-            source={{ uri: 'https://reactnative.dev' }} 
-            style={styles.promoImage} 
-          />
-          <View style={styles.promoTextContainer}>
-            <Text style={styles.promoHeading}>Learn Flexbox Layouts</Text>
-            <Text style={styles.promoDescription}>
-              Rows and columns make it super easy to design complex mobile application interfaces.
-            </Text>
-          </View>
-        </View>
-
-        {/* 4. HORIZONTAL LAYOUT SECTION: Two cards side-by-side using flexDirection: 'row' */}
-        <Text style={styles.sectionTitle}>Analytics Cards (Row Layout)</Text>
-        <View style={styles.rowLayoutContainer}>
-          
-          {/* Card 1 */}
-          <View style={styles.halfCard}>
-            <Text style={styles.cardHeader}>Active Users</Text>
-            <Text style={styles.cardValue}>1,240</Text>
-            <Text style={styles.cardGrowth}>+12% This Week</Text>
-          </View>
-
-          {/* Card 2 */}
-          <View style={styles.halfCard}>
-            <Text style={styles.cardHeader}>Tasks Solved</Text>
-            <Text style={styles.cardValue}>48</Text>
-            <Text style={styles.cardGrowth}>100% Done</Text>
-          </View>
-
-        </View>
-
-        {/* 5. PROPERLY STYLED BUTTON COMPONENT using TouchableOpacity */}
-        <TouchableOpacity style={styles.primaryButton} activeOpacity={0.8}>
-          <Text style={styles.buttonText}>Publish Dashboard Report</Text>
-        </TouchableOpacity>
-
-      </ScrollView>
+    <View style={styles.cardContainer}>
+      <Text style={styles.cardEmoji}>{props.emoji}</Text>
+      <Text style={styles.cardTitle}>{props.title}</Text>
+      <Text style={styles.cardPrice}>{props.price}</Text>
     </View>
   );
 }
 
-// StyleSheet Configuration (Topic 3.8 & 3.9)
+// =========================================================
+// 2. MAIN APPLICATION COMPONENT (Multi-Screen Navigation)
+// =========================================================
+export default function BeautySalonApp() {
+  // Topic 3.7 - State Management for Screen Routing & User Forms
+  const [currentScreen, setCurrentScreen] = useState('Home'); // Home, Services, Confirmation
+  const [customerName, setCustomerName] = useState('');
+  const [selectedDate, setSelectedDate] = useState('');
+
+  const handleBookNow = () => {
+    if (customerName.trim() === '' || selectedDate.trim() === '') {
+      Alert.alert("Input Error", "Please fill in your name and preferred date to book an appointment!");
+    } else {
+      setCurrentScreen('Confirmation');
+    }
+  };
+
+  return (
+    <View style={styles.mainScreen}>
+      
+      {/* GLOBAL HEADER APP BAR (Proper Spacing & Alignment) */}
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerTitle}>Glow & Grace Salon</Text>
+        <Text style={styles.headerSubtitle}>Premium Mobile App Dashboard</Text>
+      </View>
+
+      {/* ==========================================
+          SCREEN 1: WELCOME / HOME VIEW
+         ========================================== */}
+      {currentScreen === 'Home' && (
+        <View style={styles.centerContainer}>
+          <Image 
+            source={{ uri: 'https://reactnative.dev' }} // Placeholder for Salon Logo [3.5]
+            style={styles.salonLogo} 
+          />
+          <Text style={styles.welcomeTitle}>Welcome to Glow & Grace</Text>
+          <Text style={styles.welcomeDescription}>
+            Your premium destination for luxury hair styling, facial makeovers, and expert bridal care aesthetics.
+          </Text>
+          
+          <TouchableOpacity 
+            style={styles.primaryButton} 
+            activeOpacity={0.85}
+            onPress={() => setCurrentScreen('Services')} // Changes state to switch screen [3.7]
+          >
+            <Text style={styles.buttonText}>Explore Our Services ✨</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* ==========================================
+          SCREEN 2: SERVICES & INTERACTIVE BOOKING
+         ========================================== */}
+      {currentScreen === 'Services' && (
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <Text style={styles.sectionTitle}>1. Select Premium Services</Text>
+          
+          {/* FLEXBOX HORIZONTAL ROW GRID (Topic 3.9 - Two Modular Cards Side-by-Side) */}
+          <View style={styles.rowLayoutContainer}>
+            <ServiceCard emoji="💇‍♀️" title="Hair Styling" price="$45.00" />
+            <ServiceCard emoji="💄" title="Facial Makeup" price="$60.00" />
+          </View>
+
+          <Text style={styles.sectionTitle}>2. Secure Online Appointment</Text>
+          <View style={styles.interactiveBox}>
+            {/* TEXTINPUT COMPONENTS (Topic 3.5 & 3.8) */}
+            <TextInput
+              style={styles.inputBox}
+              placeholder="Enter Your Full Name..."
+              placeholderTextColor="#888"
+              value={customerName}
+              onChangeText={(text) => setCustomerName(text)}
+            />
+            <TextInput
+              style={styles.inputBox}
+              placeholder="Preferred Date (e.g., 12-Sep)..."
+              placeholderTextColor="#888"
+              value={selectedDate}
+              onChangeText={(text) => setSelectedDate(text)}
+            />
+
+            <TouchableOpacity 
+              style={styles.bookingButton} 
+              activeOpacity={0.8} 
+              onPress={handleBookNow}
+            >
+              <Text style={styles.buttonText}>Confirm My Appointment</Text>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity style={styles.backLink} onPress={() => setCurrentScreen('Home')}>
+            <Text style={styles.backLinkText}>← Go Back To Home</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      )}
+
+      {/* ==========================================
+          SCREEN 3: BOOKING CONFIRMATION (Dynamic JSX Rendering)
+         ========================================== */}
+      {currentScreen === 'Confirmation' && (
+        <View style={styles.centerContainer}>
+          <Text style={styles.successIcon}>🎉</Text>
+          <Text style={styles.welcomeTitle}>Booking Successful!</Text>
+          
+          {/* Dynamic JSX Expressions displaying state values [3.4] */}
+          <Text style={styles.welcomeDescription}>
+            Thank you, <Text style={styles.highlightText}>{customerName}</Text>! Your premium session has been scheduled successfully for <Text style={styles.highlightText}>{selectedDate}</Text>.
+          </Text>
+
+          <TouchableOpacity 
+            style={styles.primaryButton} 
+            onPress={() => {
+              setCustomerName('');
+              setSelectedDate('');
+              setCurrentScreen('Home'); // Resets application flow
+            }}
+          >
+            <Text style={styles.buttonText}>Book Another Session</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+    </View>
+  );
+}
+
+// =========================================================
+// 3. StyleSheet CONFIGURATION (Topic 3.8 & 3.9)
+// =========================================================
 const styles = StyleSheet.create({
   mainScreen: {
     flex: 1,
-    backgroundColor: '#f4f6f9',
+    backgroundColor: '#fff5f5', // Soft luxury pink-tinted background
   },
   headerContainer: {
-    backgroundColor: '#1D3D47',
+    backgroundColor: '#800020', // Luxury Burgundy color theme
     paddingTop: 50,
     paddingBottom: 20,
     paddingHorizontal: 20,
-    alignItems: 'center', // Center content horizontally
+    alignItems: 'center',
+    elevation: 4,
   },
   headerTitle: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#ffffff',
+    letterSpacing: 1,
   },
   headerSubtitle: {
-    fontSize: 14,
-    color: '#A1CEDC',
+    fontSize: 13,
+    color: '#FFC0CB',
     marginTop: 4,
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 25,
+  },
+  salonLogo: {
+    width: 90,
+    height: 90,
+    marginBottom: 20,
+    borderRadius: 45,
+  },
+  welcomeTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#800020',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  welcomeDescription: {
+    fontSize: 15,
+    color: '#555555',
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 30,
+    paddingHorizontal: 10,
   },
   scrollContent: {
     padding: 20,
   },
-  searchBar: {
-    width: '100%',
-    height: 50,
-    backgroundColor: '#ffffff',
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-    borderRadius: 12,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    color: '#333333',
-    marginBottom: 25,
-    // Basic shadow/elevation for depth
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#333333',
+    color: '#800020',
+    marginTop: 10,
     marginBottom: 12,
   },
-  largePromoCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 14,
-    padding: 15,
-    flexDirection: 'row', // Horizontal placement for image and text
-    alignItems: 'center',
-    gap: 15, // Space between image and text container
-    marginBottom: 25,
-    elevation: 3,
-  },
-  promoImage: {
-    width: 65,
-    height: 65,
-    borderRadius: 10,
-  },
-  promoTextContainer: {
-    flex: 1, // Take remaining row space smoothly
-  },
-  promoHeading: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#1a202c',
-    marginBottom: 4,
-  },
-  promoDescription: {
-    fontSize: 13,
-    color: '#666666',
-    lineHeight: 18,
-  },
   rowLayoutContainer: {
-    flexDirection: 'row', // Align cards side-by-side horizontally
-    justifyContent: 'space-between', // Push cards to extreme edges evenly
-    gap: 12, // Space between the cards
-    marginBottom: 30,
+    flexDirection: 'row', // Horizontal flex mechanics grid mapping
+    justifyContent: 'space-between',
+    gap: 12,
+    marginBottom: 25,
   },
-  halfCard: {
-    flex: 1, // Share equal width inside the row layout container
+  cardContainer: {
+    flex: 1,
     backgroundColor: '#ffffff',
     padding: 15,
     borderRadius: 14,
+    alignItems: 'center',
     elevation: 3,
-    borderLeftWidth: 4,
-    borderLeftColor: '#007AFF', // Nice side blue border badge
+    borderWidth: 1,
+    borderColor: '#ffd1dc',
   },
-  cardHeader: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#718096',
-    marginBottom: 6,
+  cardEmoji: {
+    fontSize: 32,
+    marginBottom: 8,
   },
-  cardValue: {
-    fontSize: 22,
+  cardTitle: {
+    fontSize: 15,
     fontWeight: 'bold',
-    color: '#1a202c',
+    color: '#333333',
     marginBottom: 4,
   },
-  cardGrowth: {
-    fontSize: 12,
-    color: '#38A169', // Green color text
-    fontWeight: '500',
+  cardPrice: {
+    fontSize: 14,
+    color: '#800020',
+    fontWeight: '600',
+  },
+  interactiveBox: {
+    backgroundColor: '#ffffff',
+    padding: 15,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#ffd1dc',
+    marginBottom: 20,
+    elevation: 2,
+  },
+  inputBox: {
+    width: '100%',
+    height: 50,
+    backgroundColor: '#fafafa',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    fontSize: 15,
+    color: '#333333',
+    marginBottom: 15,
   },
   primaryButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#800020',
     paddingVertical: 15,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 10,
+    paddingHorizontal: 30,
+    borderRadius: 25,
     elevation: 3,
+  },
+  bookingButton: {
+    backgroundColor: '#4CAF50', // Clear success green feedback loop
+    paddingVertical: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 5,
+    elevation: 2,
   },
   buttonText: {
     color: '#ffffff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  successIcon: {
+    fontSize: 64,
+    marginBottom: 15,
+  },
+  highlightText: {
+    fontWeight: 'bold',
+    color: '#800020',
+  },
+  backLink: {
+    alignSelf: 'center',
+    marginTop: 10,
+    marginBottom: 30,
+  },
+  backLinkText: {
+    color: '#800020',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
